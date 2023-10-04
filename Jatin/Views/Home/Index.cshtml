@@ -1,0 +1,43 @@
+﻿@model Jatin.Models.UserView;
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+@if (ViewBag.msg != null)
+{
+    <h1>@ViewBag.msg</h1>
+}
+
+
+@using (Html.BeginForm("Register", "Home", FormMethod.Post))
+{
+    @Html.ValidationSummary(true)
+    <fieldset>
+        <legend>Student</legend>
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Name)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Name)
+            @Html.ValidationMessageFor(model => model.Name)
+        </div>
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Username)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Username)
+            @Html.ValidationMessageFor(model => model.Username)
+        </div>
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Password)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Password)
+            @Html.ValidationMessageFor(model => model.Password)
+        </div>
+        <p>
+            <input type="submit" value="Register" />
+        </p>
+    </fieldset>
+}

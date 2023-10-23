@@ -1,23 +1,317 @@
-﻿@model IEnumerable<Jatin.Models.User>
-
-@*
+﻿@*
     For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 *@
 @{
+    ViewData["Title"] = "Home";
+    Layout = "~/Views/Shared/_LayoutJatin.cshtml";
 }
 
-@if( ViewBag.UserMsg != null){
-    <h1>@ViewBag.UserMsg</h1>
-}
-
-@if (Model == null || Model.Count() ==0)
-{
-    <h3>No Users</h3>
-}
-else
-{
-    @foreach (var item in Model)
+<div class="homeDiv">
+    <div class="formBody">
+        <div class="userPic">
+            <i class="fa-regular fa-user" style="color: #000000;"></i>
+        </div>
+        <h1>@ViewBag.UserName</h1>
+        <h2>Add Task Reminder</h2>
+        <div>
+            <input type="text" id="taskName" placeholder="Task Name" />
+            <span id="nameValidation" style="color:red;">Task name is required.</span>
+            <input type="text" id="taskDesc" placeholder="Task Description" />
+            <span id="descValidation" style="color:red;">Description is required.</span>
+            @* <input type="text" onfocus="(this.type='date')" onblur="(this.type='text')" id="taskDate" value="" /> *@
+            <input type="date" id="taskDate" value=""  />
+            <span id="dateValidation" style="color:red;">Date is required.</span>
+        </div>
+        <div id="buttonToggle">
+            <button type="button" id="createBtn" class="btn-action">Create</button>
+        </div>
+    </div>
+    <div class="formBody">
+        <h2>Task Reminders</h2>
+        <div class="taskTable">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Task Name</th>
+                        <th>Task Description</th>
+                        <th>Operation</th>
+                    </tr>
+                </thead>
+                <tbody id="taskDiv">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+@{
+    if (ViewBag.UserId != null)
     {
-        <h3>@item.Name</h3>
+    <script>
+                                                        let dataList=[];
+                                                                        function showDataTable() {
+                                                                            $('#nameValidation').hide();
+                                                                            $('#descValidation').hide();
+                                                                            $('#dateValidation').hide();
+
+                                                                            $.ajax({
+                                                                                type: "GET",
+                                                                                url: "/fetchAllData",
+                                                                                contentType: false,
+                                                                                processData: false,
+                                                                                success: function (data, textStatus, jqXHR) {
+                                                                                    if (data.msg == "success") {
+                                                                                        if (data.tasks == null) {
+                                                                                            $('#taskDiv').html('<tr><td colspan="3">No Tasks</td></tr>');
+                                                                                        }
+                                                                                        else {
+                                                                                            var tableData = "";
+                                                                                            var arr = data.tasks;
+                                                                                            dataList = arr;
+                                                                                            arr.forEach((element) => {
+                                                                                                tableData += '<tr><td>' + element.name + '</td><td>' + element.description + '</td>';
+                                                                                                if (element.activeStatus == 1) {
+                                                                                                    tableData += '<td><br><button onclick="DisableFn(' + element.id + ')" >Disable</button><br>';
+                                                                                                }
+                                                                                                else {
+                                                                                                    tableData += '<td><br><button onclick="EnableFn(' + element.id + ')" >Enable</button><br>';
+                                                                                                }
+                                                                                                tableData += '<br> <button onclick="DeleteFn(' + element.id + ')" >Delete</button><br><br><button onclick="setDataTask('+element.id+')" >Update</button></td>';
+                                                                                                tableData += '</tr>';
+                                                                                            });
+                                                                                            $('#taskDiv').html(tableData);
+                                                                                        }
+                                                                                    }
+                                                                                },
+                                                                                error: function (jqXHR, textStatus, errorThrown) {
+                                                                                    console.log("error");
+                                                                                }
+                                                                            })
+                                                                        }
+
+                                                                function DeleteFn(g){
+                                                                    var fD = new FormData();
+                                                                    fD.append("remId", g);
+                                                                    $.ajax({
+                                                                        type: "POST",
+                                                                        url: "/DeleteReminder",
+                                                                        data: fD,
+                                                                        contentType: false,
+                                                                        processData: false,
+                                                                        success: function (data, textStatus, jqXHR) {
+                                                                            if (data.msg == "Success") {
+                                                                                alert("Task Deleted Successfully");
+                                                                                showDataTable();
+                                                                            }
+                                                                            else {
+                                                                                alert(data.msg);
+                                                                            }
+                                                                        },
+                                                                        error: function (jqXHR, textStatus, errorThrown) {
+                                                                            console.log("error");
+                                                                        }
+                                                                    })
+
+                                                                }
+
+                                                            function EnableFn(g) {
+                                                                var fD = new FormData();
+                                                                fD.append("remId", g);
+                                                                $.ajax({
+                                                                    type: "POST",
+                                                                    url: "/EnableTask",
+                                                                    data: fD,
+                                                                    contentType: false,
+                                                                    processData: false,
+                                                                    success: function (data, textStatus, jqXHR) {
+                                                                        if (data.msg == "Success") {
+                                                                            alert("Task Enabled Successfully");
+                                                                            showDataTable();
+                                                                        }
+                                                                        else {
+                                                                            alert(data.msg);
+                                                                        }
+                                                                    },
+                                                                    error: function (jqXHR, textStatus, errorThrown) {
+                                                                        console.log("error");
+                                                                    }
+                                                                })
+
+                                                            }
+
+                                                            function DisableFn(g) {
+                                                                var fD = new FormData();
+                                                                fD.append("remId", g);
+                                                                $.ajax({
+                                                                    type: "POST",
+                                                                    url: "/DisableTask",
+                                                                    data: fD,
+                                                                    contentType: false,
+                                                                    processData: false,
+                                                                    success: function (data, textStatus, jqXHR) {
+                                                                        if (data.msg == "Success") {
+                                                                            alert("Task Disabled Successfully");
+                                                                            showDataTable();
+                                                                        }
+                                                                        else {
+                                                                            alert(data.msg);
+                                                                        }
+                                                                    },
+                                                                    error: function (jqXHR, textStatus, errorThrown) {
+                                                                        console.log("error");
+                                                                    }
+                                                                })
+
+                                                            }
+
+                                                                        function createTask () {
+                                                                            var f = false;
+                                                                            var ff = false;
+                                                                            var fff = false;
+                                                                            var taskName = $('#taskName').val();
+                                                                            var taskDesc = $('#taskDesc').val();
+                                                                            var taskDate = $('#taskDate').val();
+                                                                            if (taskName == "") {
+                                                                                $('#nameValidation').show();
+                                                                                f = true;
+                                                                            }
+                                                                            else {
+                                                                                $('#nameValidation').hide();
+                                                                                f = false;
+                                                                            }
+                                                                            if (taskDesc == "") {
+                                                                                $('#descValidation').show();
+                                                                                ff = true;
+                                                                            }
+                                                                            else {
+                                                                                $('#descValidation').hide();
+                                                                                ff = false;
+                                                                            }
+                                                                            if (taskDesc == "") {
+                                                                                $('#dateValidation').show();
+                                                                                fff = true;
+                                                                            }
+                                                                            else {
+                                                                                $('#dateValidation').hide();
+                                                                                fff = false;
+                                                                            }
+                                                                            if (f || ff || fff) {
+                                                                                return;
+                                                                            }
+                                                                            var fD = new FormData();
+                                                                            fD.append("Name", taskName);
+                                                                            fD.append("Description", taskDesc);
+                                                                            fD.append("DateAt", taskDate);
+                                                                            $.ajax({
+                                                                                type: "POST",
+                                                                                url: "/AddReminder",
+                                                                                data: fD,
+                                                                                contentType: false,
+                                                                                processData: false,
+                                                                                success: function (data, textStatus, jqXHR) {
+                                                                                    if (data.msg == "Success") {
+                                                                                        alert("Task Added Successfully");
+                                                                                        $('#taskName').val("");
+                                                                                        $('#taskDesc').val("");
+                                                                                        $('#taskDate').val("");
+                                                                                        showDataTable();
+                                                                                    }
+                                                                                    else {
+                                                                                        alert(data.msg);
+                                                                                    }
+                                                                                },
+                                                                                error: function (jqXHR, textStatus, errorThrown) {
+                                                                                    console.log("error");
+                                                                                }
+                                                                            })
+                                                                        }
+
+                                            function setDataTask(fid) {
+                                                
+                                                dataList.forEach((element) => {
+                                                    if (element.id == fid) {
+                                                        $('#taskName').val(element.name);
+                                                        $('#taskDesc').val(element.description);
+                                                        var dateOf = element.dateAt;
+                                                        document.getElementById("taskDate").value = dateOf[6] + dateOf[7] + dateOf[8] + dateOf[9] + "-" + dateOf[3] + dateOf[4] + "-" + dateOf[0] + dateOf[1];
+                                                        $('#buttonToggle').html('<button type="button" onclick="updateTask('+fid+')" class="btn-action">Update</button>')
+                                                    }
+                                                })
+                                            }
+
+
+                                                    function updateTask(fid) {
+                                                        var f = false;
+                                                        var ff = false;
+                                                        var fff = false;
+                                                        var taskName = $('#taskName').val();
+                                                        var taskDesc = $('#taskDesc').val();
+                                                        var taskDate = $('#taskDate').val();
+                                                        if (taskName == "") {
+                                                            $('#nameValidation').show();
+                                                            f = true;
+                                                        }
+                                                        else {
+                                                            $('#nameValidation').hide();
+                                                            f = false;
+                                                        }
+                                                        if (taskDesc == "") {
+                                                            $('#descValidation').show();
+                                                            ff = true;
+                                                        }
+                                                        else {
+                                                            $('#descValidation').hide();
+                                                            ff = false;
+                                                        }
+                                                        if (taskDesc == "") {
+                                                            $('#dateValidation').show();
+                                                            fff = true;
+                                                        }
+                                                        else {
+                                                            $('#dateValidation').hide();
+                                                            fff = false;
+                                                        }
+                                                        if (f || ff || fff) {
+                                                            return;
+                                                        }
+                                                        var fD = new FormData();
+                                                        fD.append("Name", taskName);
+                                                        fD.append("Description", taskDesc);
+                                                        fD.append("DateAt", taskDate);
+                                                        fD.append("Id", fid);
+                                                        $.ajax({
+                                                            type: "POST",
+                                                            url: "/UpdateReminder",
+                                                            data: fD,
+                                                            contentType: false,
+                                                            processData: false,
+                                                            success: function (data, textStatus, jqXHR) {
+                                                                if (data.msg == "Success") {
+                                                                    alert("Task Updated Successfully");
+                                                                    $('#taskName').val("");
+                                                                    $('#taskDesc').val("");
+                                                                    $('#taskDate').val("");
+                                                                    $('#buttonToggle').html('<button type="button" id="createBtn" class="btn-action">Create</button>')
+                                                                    showDataTable();
+                                                                }
+                                                                else {
+                                                                    alert(data.msg);
+                                                                }
+                                                            },
+                                                            error: function (jqXHR, textStatus, errorThrown) {
+                                                                console.log("error");
+                                                            }
+                                                        })
+                                                    }
+                                                                        
+
+                                                                                                                        
+                                                                            $(document).ready(
+                                                                                showDataTable(),
+                                                                                $('.formBody').on('click', '#createBtn', function () {
+                                                                                    createTask();
+                                                                                })
+                                                                            );
+
+    </script>
     }
 }

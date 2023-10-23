@@ -1,27 +1,52 @@
-﻿@model Jatin.Models.UserView;
+﻿@model Jatin.Models.LoginModel;
 
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Login";
+    Layout = "~/Views/Shared/_LayoutJatin.cshtml";
 }
 
+<form class="formBody" method="post" action="Login">
+    <div class="userPic">
+        <i class="fa-regular fa-user" style="color: #000000;"></i>
+    </div>
+    <h1>Sign In</h1>
+    @if (ViewBag.Msg != null)
+    {
+        <h5 style="padding:0px;margin:0px;">@ViewBag.Msg</h5>
+    }
+    <div>
+        <input type="text" asp-for="Username" placeholder="Username" /><br />
+        @Html.ValidationMessageFor(model=>model.Username)<br />
+        <input type="password" placeholder="Password" asp-for="Password" /><br />
+        @Html.ValidationMessageFor(model=>model.Password)<br />
+    </div>
+    <div>
+        <input type="submit" class="btn-action" value="Sign In" />
+    </div>
+    <span>Don't have an account? <a asp-action="Register" asp-controller="Home"><b>Sign Up</b></a></span>
+</form>
+
+
+
+
+@{
+            /*
 @if (ViewBag.msg != null)
 {
     <h1>@ViewBag.msg</h1>
 }
 
-
-@using (Html.BeginForm("Register", "Home", FormMethod.Post))
+@if(ViewBag.Msg != null)
 {
+    <h3>@ViewBag.Msg</h3>
+}
+
+<h1 class="text-center">Login</h1>
+
+    @using (Html.BeginForm("Login", "Home", FormMethod.Post))
+    {
     @Html.ValidationSummary(true)
-    <fieldset>
-        <legend>Student</legend>
-        <div class="editor-label">
-            @Html.LabelFor(model => model.Name)
-        </div>
-        <div class="editor-field">
-            @Html.EditorFor(model => model.Name)
-            @Html.ValidationMessageFor(model => model.Name)
-        </div>
+        <fieldset>
         <div class="editor-label">
             @Html.LabelFor(model => model.Username)
         </div>
@@ -36,8 +61,9 @@
             @Html.EditorFor(model => model.Password)
             @Html.ValidationMessageFor(model => model.Password)
         </div>
-        <p>
+            <p>
             <input type="submit" value="Register" />
-        </p>
-    </fieldset>
+    </p>
+            </fieldset>
+    }*/
 }

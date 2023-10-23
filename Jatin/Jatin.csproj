@@ -9,5 +9,20 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.SqlClient" Version="5.1.1" />
   </ItemGroup>
+  <!--<modules runAllManagedModulesForAllRequests="false">
+    <remove name="WebDAVModule" />
+  </modules>-->
+  <!--<system.webServer>
+    <modules>
+      <remove name="WebDAVModule" />
+    </modules>
+    <handlers>
+      <remove name="WebDAV" />
+    </handlers>
+  </system.webServer>-->
+
+  <ItemGroup>
+    <Folder Include="wwwroot\userProfile\" />
+  </ItemGroup>
 
 </Project>

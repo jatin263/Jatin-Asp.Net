@@ -1,0 +1,79 @@
+﻿@model Jatin.Models.UserView;
+
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_LayoutJatin.cshtml";
+}
+
+<form class="formBody" action="Register" method="post" enctype="multipart/form-data">
+    <div class="userPic">
+        <i class="fa-regular fa-user" style="color: #000000;"></i>
+    </div>
+    <h1>Sign Up</h1>
+    @if (ViewBag.Msg != null)
+    {
+        <h5 style="padding:0px;margin:0px;">@ViewBag.Msg</h5>
+    }
+    <div>
+        <input type="text" asp-for=Name placeholder="Name"><br />
+        @Html.ValidationMessageFor(model=>model.Name)<br />
+        <input type="text" asp-for=Username placeholder="Username"><br />
+        @Html.ValidationMessageFor(model=>model.Username)<br />
+        <input type="password" asp-for=Password placeholder="Password"><br />
+        @Html.ValidationMessageFor(model=>model.Password)<br />
+        <input asp-for=Profile_Path id="file" onchange="showPic(event)"><br>
+        <label for="file" style="cursor: pointer;" class="uploadBtn"><i class="fa-solid fa-upload"></i> Choose file</label><br />
+    </div>
+    <div id="profilePicPreview">
+    </div>
+    <br>
+    <div>
+        <button class="btn-action">Sign Up</button>
+    </div>
+    <span>Already have an account? <a asp-action="Index" asp-controller="Home"><b>Sign In</b></a></span>
+</form>
+
+
+@{ 
+    /*
+    if (ViewBag.Msg != null)
+    {
+    <h4>@ViewBag.Msg</h4>
+        }
+
+        <h1 class ="text-center">Register Yourself</h1>
+        @using (Html.BeginForm("Register","Home",FormMethod.Post)){
+    @Html.ValidationSummary(true);
+        <fieldset>
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Name)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Name)
+            @Html.ValidationMessageFor(model => model.Name)
+        </div>
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Username)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Username)
+            @Html.ValidationMessageFor(model => model.Username)
+        </div>
+        <div class="editor-label">
+            @Html.LabelFor(model => model.Password)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.Password)
+            @Html.ValidationMessageFor(model => model.Password)
+        </div>
+            <p>
+            <input type="submit" value="Register" />
+    </p>
+            </fieldset>
+        }
+    */
+   }
+

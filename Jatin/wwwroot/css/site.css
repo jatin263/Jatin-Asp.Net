@@ -1,18 +1,189 @@
-html {
-  font-size: 14px;
-}
-
-@media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
-}
-
-html {
-  position: relative;
-  min-height: 100%;
-}
-
 body {
-  margin-bottom: 60px;
+    margin: 0;
+    padding: 0;
+    background-color: #E4C5C3;
+    display: flex;
+    height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    flex-wrap: wrap;
+}
+
+
+.formBody {
+    background-color: beige;
+    height: 75vh;
+    width: 60vw;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    max-width: 500px;
+    margin: auto;
+    border-radius: 25px;
+    border: 5px solid #CCCFCF;
+    box-shadow: 15px 15px 20px #1c2323;
+    padding: 10px;
+}
+
+.userPic {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgb(9,9,36);
+    background: linear-gradient(90deg, rgba(9,9,36,0.4431022408963585) 0%, rgba(238,109,78,1) 0%, rgba(184,64,127,1) 100%);
+}
+
+    .userPic i {
+        position: relative;
+        top: 15px;
+        left: 16px;
+        font-size: 2rem;
+    }
+
+.formBody h1 {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 1.5rem;
+}
+
+.formBody h2 {
+    margin: 2px;
+}
+
+.formBody div input {
+    padding: 6px;
+    /* margin-top: 5px;
+    margin-bottom: 5px; */
+    margin: 5px 200px;
+    border: 1px solid black;
+    border-radius: 8px;
+}
+
+.formBody div span {
+    margin: 5px 200px;
+    color: red;
+}
+
+.btn-action {
+    margin-top: 8px;
+    padding: 5px;
+    font-size: 1.1rem;
+    background: rgb(9,9,36);
+    background: linear-gradient(90deg, rgba(9,9,36,0.4431022408963585) 0%, rgba(238,109,78,1) 0%, rgba(184,64,127,1) 100%);
+    border: 2px solid transparent;
+    border-radius: 8px;
+}
+
+.formBody span {
+    font-size: 0.8rem;
+    margin-top: 20px;
+}
+
+table, tr, td, th {
+    border: 1px solid black;
+    border-collapse: collapse;
+    text-align: center;
+}
+
+.homeDiv {
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+}
+
+.formBody span a {
+    color: black;
+    text-decoration: none;
+}
+
+table {
+    width: 100%;
+}
+
+.taskTable {
+    display: block;
+    height: 400px;
+    overflow: scroll;
+}
+
+#file {
+    display: none;
+}
+
+.uploadBtn {
+    position: relative;
+    left: 220px;
+    top: 8px;
+}
+
+.taskTable::-webkit-scrollbar {
+    display: none;
+}
+
+#profilePicPreview {
+
+    margin-top: 10px;
+    width: 220px;
+    height: 80px;
+    display: none;
+}
+
+#profilePicPreview img {
+    margin: auto;
+}
+
+#taskDiv {
+    height: 200px;
+    overflow: scroll;
+}
+
+table thead tr th {
+    position: sticky;
+    top: -1px;
+    background-color: aliceblue;
+}
+
+.btn-opt {
+    background-color: transparent;
+    margin-top: 7px;
+    margin-bottom: 7px;
+}
+
+@media screen and (max-width: 700px) {
+    body {
+        display: block;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .formBody {
+        width: 300px;
+        height: 500px;
+        margin-top: 50px;
+        margin-bottom: 20px;
+    }
+
+    .homeDiv {
+        display: block;
+        overflow: scroll;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+
+    #taskDiv {
+        height: 100px;
+        overflow: hidden;
+    }
+
+    .formBody div input {
+        margin: 5px 100px;
+    }
+
+    .uploadBtn {
+        left: 120px;
+    }
+
+    .formBody div span {
+        margin: 5px 100px;
+        color: red;
+    }
 }

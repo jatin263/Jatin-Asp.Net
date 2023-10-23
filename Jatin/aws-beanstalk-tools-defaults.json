@@ -1,0 +1,20 @@
+
+{
+    "region" : "ap-south-1",
+    "configuration" : "Debug",
+    "framework"     : "net6.0",
+    "self-contained" : false,
+    "application"    : "Jatin",
+    "environment"    : "Jatin-test",
+    "enable-xray"    : false,
+    "enhanced-health-type" : "basic",
+    "additional-options"   : "\"aws:autoscaling:launchconfiguration,SecurityGroups\"=\"sg-0ecd225214eeb6aae\";\"aws:ec2:vpc,Subnets\"=\"subnet-0852ed4236ffbafb8\"",
+    "solution-stack"       : "64bit Amazon Linux 2 v2.6.0 running .NET Core",
+    "environment-type"     : "SingleInstance",
+    "cname"                : "jatin-test",
+    "instance-type"        : "t2.small",
+    "key-pair"             : "",
+    "instance-profile"     : "aws-elasticbeanstalk-ec2-role",
+    "service-role"         : "aws-elasticbeanstalk-service-role",
+    "proxy-server"         : "nginx"
+}

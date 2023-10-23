@@ -1,94 +1,95 @@
 ﻿using Jatin.Data;
 using Jatin.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Data.SqlClient;
 using System.Diagnostics;
 
 namespace Jatin.Controllers
 {
     public class HomeController : Controller
     {
-        private static string name = "Jatin";
-        private static List<User> _users;
+        private static string uId = null;
+        private static string uName = null;
+        private static List<ReminderTaskView> _reminderTaskView = null;
         private readonly ILogger<HomeController> _logger;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, IWebHostEnvironment webHostEnvironment)
         {
             _logger = logger;
+            _webHostEnvironment = webHostEnvironment;
         }
+
+
+        [HttpPost]
+        [Route("Register")]
+        public async Task<IActionResult> Register(UserView v)
+        {
+            if (ModelState.IsValid)
+            {
+                if(v.Profile_Path != null) {
+                    string folder = "userProfile/";
+                    folder += Guid.NewGuid().ToString()+v.Profile_Path.FileName;
+                    string serverFolder = Path.Combine(_webHostEnvironment.WebRootPath, folder);
+                    using (var stream = System.IO.File.Create(serverFolder))
+                    {
+                        await v.Profile_Path.CopyToAsync(stream);
+                    }
+                    if (ApplicationDB.registerUser(v,folder))
+                    {
+                        ViewBag.Msg = "Register Successfully";
+                        return RedirectToAction("Index");
+                    }
+                    else
+                    {
+                        ViewBag.Msg = "Error while Registering";
+                    }
+                }
+                else
+                {
+                    if (ApplicationDB.registerUser(v))
+                    {
+                        ViewBag.Msg = "Register Successfully";
+                        return RedirectToAction("Index");
+                    }
+                    else
+                    {
+                        ViewBag.Msg = "Error while Register";
+                    }
+                }
+            }
+            return View(v);
+        }
+
+
+        [Route("Register")]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+       
 
         public IActionResult Index()
         {
             return View();
         }
         [HttpPost]
-        [Route("Register")]    
-        public IActionResult Register(UserView v)
+        [Route("Login")]    
+        public IActionResult Login(LoginModel v)
         {
-            List<User> users = new List<User>();
-           if(ModelState.IsValid)
+            if(ModelState.IsValid)
             {
-                Guid id = Guid.NewGuid();
-                User user = new User();
-                user.Id = id;
-                user.Name= v.Name;
-                user.Username = v.Username;
-                user.Password = v.Password;
-                string dbCS = ApplicationDB.getConnectionString();
-                SqlConnection conn = null;
-                try
+                User u = ApplicationDB.getUser(v.Username.ToString());
+                if (u == null || u.Password != v.Password)
                 {
-                    using (conn = new SqlConnection(dbCS))
-                    {
-                        conn.Open();
-                        if (conn.State == System.Data.ConnectionState.Open)
-                        {
-                            string sql = "Insert into Users values (@id,@name,@username,@password)";
-                            SqlCommand sqlCommand = new SqlCommand(sql,conn);
-                            sqlCommand.Parameters.AddWithValue("@id", user.Id);
-                            sqlCommand.Parameters.AddWithValue("@name",user.Name);
-                            sqlCommand.Parameters.AddWithValue("@username", user.Username);
-                            sqlCommand.Parameters.AddWithValue("@password", user.Password);
-                            if(sqlCommand.ExecuteNonQuery() > 0)
-                            {
-                                ViewBag.UserMsg = "Saved";
-                            }
-                            else
-                            {
-                                ViewBag.UserMsg = "Not Saved";
-                            }
-                            sql = "Select * from Users";
-                            sqlCommand = new SqlCommand(sql,conn);
-                            SqlDataReader dr = sqlCommand.ExecuteReader();
-                            while (dr.Read())
-                            {
-                               User u = new User();
-                                u.Id = new Guid(dr["ID"].ToString());
-                                u.Username = dr["Username"].ToString();
-                                u.Password = dr["Password"].ToString();
-                                u.Name = dr["Name"].ToString();
-                                users.Add(u);
-                            }
-                            _users= users;
-                            return RedirectToAction("Home");
-                            
-                        }
-                        else
-                        {
-                            ViewBag.msg = "Close";
-                        }
-                    }
+                    ViewBag.msg = "Wrong Username or Password";
+                    return View("Index", v);
                 }
-                catch (Exception ex)
-                {
-                    ViewBag.msg = ex.Message;
-                }
-                finally
-                {
-                    conn.Close();
-                }
+                uId = u.Id.ToString();
+                uName = u.Name.ToString();
+                return RedirectToAction("Home");
             }
-           return View("Index",v);
+            return View("Index",v);
         }
 
         public IActionResult Privacy()
@@ -96,11 +97,176 @@ namespace Jatin.Controllers
             return View();
         }
 
+        [Route("Home")]
         public IActionResult Home()
         {
-            List<User> users = _users;
-            return View(users);
+            if (uId == null)
+            {
+                return RedirectToAction("Index");
+            }
+            ViewBag.UserId = uId;
+            ViewBag.UserName = uName;
+            return View();
         }
+
+        [HttpGet]
+        [Route("fetchAllData")]
+        public IActionResult getAllReminders()
+        {
+            JsonResponse j = new JsonResponse();
+            string userId = uId;
+            if(uId == null)
+            {
+                j.msg = "Invalid User";
+                j.Tasks = null;
+            }
+            
+            Guid g;
+            try
+            {
+                g = new Guid(userId);
+            }
+            catch (Exception ex)
+            {
+                j.msg = "Invalid UserId";
+                return Json(j);
+            }
+            j.msg = "success";
+            j.Tasks = ApplicationDB.getReminderTasks(g);
+            return Json(j);
+            
+        }
+
+
+        [HttpPost]
+        [Route("AddReminder")]
+        public IActionResult AddReminder(NewReminderTask nRT)
+        {
+            AddJsonResponse ajr = new AddJsonResponse();
+            if (uId == null)
+            {
+                
+                ajr.msg = "Invalid User";
+                return Json(ajr);
+            }
+            if (!ModelState.IsValid)
+            {
+                ajr.msg = "Invalid Paramters";
+                return Json(ajr);
+            }
+            Guid guid = new Guid(uId);
+            if (ApplicationDB.setReminderTask(nRT, guid))
+            {
+                ajr.msg = "Success";
+            }
+            else
+            {
+                ajr.msg = "Failed";
+            }
+            
+            return Json(ajr);
+
+        }
+
+        [HttpPost]
+        [Route("DeleteReminder")]
+        public IActionResult DeleteReminder(int remId)
+        {
+            AddJsonResponse ajr= new AddJsonResponse();
+            if (uId == null)
+            {
+                ajr = new AddJsonResponse();
+                ajr.msg = "Invalid User";
+                return Json(ajr);
+            }
+            if (ApplicationDB.deleteReminder(remId,uId))
+            {
+                ajr.msg = "Success";
+            }
+            else
+            {
+                ajr.msg = "Failed";
+            }
+            return Json(ajr);
+        }
+
+        [HttpPost]
+        [Route("DisableTask")]
+        public IActionResult DisableTask(int remId)
+        {
+            AddJsonResponse ajr = new AddJsonResponse();
+            if (uId == null)
+            {
+                ajr = new AddJsonResponse();
+                ajr.msg = "Invalid User";
+                return Json(ajr);
+            }
+            if (ApplicationDB.disableTask(remId, uId))
+            {
+                ajr.msg = "Success";
+            }
+            else
+            {
+                ajr.msg = "Failed";
+            }
+            return Json(ajr);
+        }
+
+        [HttpPost]
+        [Route("EnableTask")]
+        public IActionResult EnableTask(int remId)
+        {
+            AddJsonResponse ajr = new AddJsonResponse();
+            if (uId == null)
+            {
+                ajr = new AddJsonResponse();
+                ajr.msg = "Invalid User";
+                return Json(ajr);
+            }
+            if (ApplicationDB.enableTask(remId, uId))
+            {
+                ajr.msg = "Success";
+            }
+            else
+            {
+                ajr.msg = "Failed";
+            }
+            return Json(ajr);
+        }
+
+
+        [HttpPost]
+        [Route("UpdateReminder")]
+        public IActionResult UpdateReminder(UpdateReminder nRT)
+        {
+            AddJsonResponse ajr = new AddJsonResponse();
+            if (uId == null)
+            {
+
+                ajr.msg = "Invalid User";
+                return Json(ajr);
+            }
+            if (!ModelState.IsValid)
+            {
+                ajr.msg = "Invalid Paramters";
+                return Json(ajr);
+            }
+            Guid guid = new Guid(uId);
+            if (ApplicationDB.updateReminderTask(nRT, guid))
+            {
+                ajr.msg = "Success";
+            }
+            else
+            {
+                ajr.msg = "Failed";
+            }
+
+            return Json(ajr);
+
+        }
+
+
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

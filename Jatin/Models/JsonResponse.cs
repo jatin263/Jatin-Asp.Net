@@ -17,4 +17,12 @@
         public string msg { get; set; }
 
     }
+
+    public class PhoneBookContactJson
+    {
+        public string status { get; set;}
+        public List<PhoneBookContact> contacts { get; set; }
+
+
+    }
 }

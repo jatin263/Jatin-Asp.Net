@@ -412,6 +412,7 @@ namespace Jatin.Data
                     {
                         string procedureCommand = "OperationUser";
                         SqlCommand cmd = new SqlCommand(procedureCommand, conn);
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
                         cmd.Parameters.AddWithValue("@action", "getData");
                         cmd.Parameters.AddWithValue("@email", email);
                         SqlDataReader reader = cmd.ExecuteReader();
@@ -419,6 +420,7 @@ namespace Jatin.Data
                         while (reader.Read())
                         {
                             phoneBookUser.Id = reader["id"].ToString();
+                            phoneBookUser.Name = reader["name"].ToString();
                             phoneBookUser.Email = reader["email"].ToString();
                             phoneBookUser.PhoneNumber = reader["phone"].ToString();
                             phoneBookUser.Password = reader["password"].ToString();
@@ -493,8 +495,9 @@ namespace Jatin.Data
                         res = cmd.ExecuteNonQuery();
 
                     }
-                    catch
+                    catch(Exception ex)
                     {
+                        Console.WriteLine(ex.Message);
                         res = 0;
                     }
                     if (res > 0)
@@ -508,6 +511,71 @@ namespace Jatin.Data
                 }
              }
             return false;
+        }
+
+        public static int addContact(PhoneBookContactAdd p)
+        {
+            int res = 0;
+            SqlConnection conn = null;
+            using(conn = new SqlConnection(getConnectionString()))
+            {
+                conn.Open();
+                if(conn.State == System.Data.ConnectionState.Open)
+                {
+                    string sql = "OperationContact";
+                    SqlCommand cmd = new SqlCommand(sql,conn);
+                    cmd.CommandType= System.Data.CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@action", "add");
+                    cmd.Parameters.AddWithValue("@uID", p.uId);
+                    cmd.Parameters.AddWithValue("@name", p.Name);
+                    cmd.Parameters.AddWithValue("@phone", p.PhoneNumber);
+                    try
+                    {
+                        res= cmd.ExecuteNonQuery();
+                    }
+                    catch
+                    {
+                        res = 0;
+                    }
+                }
+            }
+            return res;
+
+        }
+
+        public static List<PhoneBookContact> GetContacts(string uId)
+        {
+            List<PhoneBookContact> n = new List<PhoneBookContact>();
+
+            SqlConnection conn = null;
+            using(conn=new SqlConnection(getConnectionString())) {
+                conn.Open();
+                try
+                {
+                    if (conn.State == System.Data.ConnectionState.Open)
+                    {
+                        string storeProcedure = "OperationContact";
+                        SqlCommand cmd = new SqlCommand(storeProcedure, conn);
+                        cmd.CommandType = System.Data.CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@action", "read");
+                        cmd.Parameters.AddWithValue("@uID", uId);
+                        SqlDataReader r = cmd.ExecuteReader();
+                        while (r.Read())
+                        {
+                            PhoneBookContact contact = new PhoneBookContact();
+                            contact.PhoneNumber = r["phone"].ToString();
+                            contact.Name = r["name"].ToString();
+                            contact.Id = r["id"].ToString();
+                            n.Add(contact);
+                        }
+                    }
+                }
+                catch { 
+                
+                }
+                }
+
+            return n;
         }
 
 

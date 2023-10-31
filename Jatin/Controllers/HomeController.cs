@@ -2,6 +2,7 @@
 using Jatin.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using TempServices;
 
 namespace Jatin.Controllers
 {
@@ -71,6 +72,17 @@ namespace Jatin.Controllers
 
         public IActionResult Index()
         {
+           /* try
+            {
+                TempServices.TempConvertSoapClient obj = new TempServices.TempConvertSoapClient(TempConvertSoapClient.EndpointConfiguration.TempConvertSoap);
+                var p = obj.CelsiusToFahrenheit("50");
+                Console.WriteLine(p);
+
+            }
+            catch (Exception ex) {
+                Console.WriteLine(ex.Message);
+            }    
+             */
             return View();
         }
         [HttpPost]

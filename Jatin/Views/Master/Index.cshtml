@@ -1,0 +1,108 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    Layout = "~/Views/Shared/_Layout1.cshtml";
+    ViewData["Title"] = "Master";
+}
+
+<script src="~/lib/angularjs/angular.min.js"></script>
+<script src="~/js/Block1.js" asp-append-version="true"></script>
+<style>
+    .page-link{
+        background-color:green;
+        color:white;
+    }
+
+    
+</style>
+<div ng-app="Block1">
+    <div ng-controller="BlockController">
+        <div class="d-flex justify-content-center mb-5 mt-4">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <label for="inputState" class="form-label">Search</label>
+                    <input type="text" ng-model="filtText" class="form-control" placeholder="Filter Text" aria-label="Filter Text"  aria-describedby="basic-addon1">
+                </div>
+               @*  <div class="col-md-4">
+                    <label for="inputState" class="form-label">Records Per Page</label>
+                    <input type="number" class="form-control" value="{{itemPerPage}}" aria-describedby="basic-addon1">
+                </div> *@
+                <div class="col-md-4">
+                    <label for="inputState" class="form-label">Division</label>
+                    <select id="inputState" class="form-select" ng-model="divisionChose" ng-options="x.DIVISION_ENG for x in divisionData" ng-change="setDistrict()">
+                        <option selected>-- Select --</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="inputState" class="form-label">District</label>
+                    <select id="inputState" class="form-select" ng-model="districtChoose" ng-options="x.DISTRICT_ENG for x in districtData" ng-change="setBlock()" >
+                        <option selected>-- Select --</option>
+                    </select>
+                </div>
+                <div class="col-md-3 p-4">
+                    <button type="button" class="btn btn-success p-2" style="width:150px" ng-click="filterData()">Filter</button>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="mt-5">
+            <div class="d-flex justify-content-end">
+                <div class="col-md-4" style="width:100px">
+                    <label for="inputState" class="form-label" style="font-size:0.8rem">Records Per Page</label>
+                    <select style="width:100px" onchange="setItemPerPage(this)">
+                        <option value="10" selected>10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                    @* <input type="number" class="form-control" value="{{itemPerPage}}" aria-describedby="basic-addon1"> *@
+                </div>
+            </div>
+            <table class="table table-striped table-hover">
+                <thead>
+                <th>SR. NO</th>
+                <th>District</th>
+                <th>Sub Distrcit</th>
+                <th>Block Name(Eng)</th>
+                <th>Block Name(Hindi)</th>
+                <th>Is Active?</th>
+                <th>Edit</th>
+                <th>Delete</th>
+                </thead>
+                <tr ng-repeat="x in blockData">
+                    <td>{{x.SrNo}}</td>
+                    <td>{{x.district_eng}}</td>
+                    <td>{{x.subdistrict_eng}}</td>
+                    <td>{{x.block_eng}}</td>
+                    <td>{{x.block_hindi}}</td>
+                    <td>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider round"></span>
+                        </label>
+                    </td>
+                    <td>
+                        <i class="fa-regular fa-pen-to-square" style="font-size: 1rem; color: white;background-color: rgb(93, 211, 235);padding: 9px; border-radius: 4px;"></i>
+                    </td>
+                    <td>
+                        <i class="fa-solid fa-trash-can" style="font-size: 1rem; color: white;background-color: rgb(241, 55, 55);padding: 9px; border-radius: 4px;"></i>
+                    </td>
+                </tr>
+            </table>
+            <nav aria-label="Page navigation example" class="w-100">
+                <ul class="pagination justify-content-end" id="pageNav">
+                    <li class="page-item disabled">
+                        <a class="page-link">Previous</a>
+                    </li>
+                    <li class="page-item"><a class="page-link" >1</a></li>
+                    <li class="page-item"><a class="page-link" >2</a></li>
+                    <li class="page-item"><a class="page-link" >3</a></li>
+                    <li class="page-item">
+                        <a class="page-link">Next</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
